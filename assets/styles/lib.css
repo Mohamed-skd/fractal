@@ -1,0 +1,155 @@
+/* BASE */
+.debug {
+  border: 0.2rem solid red;
+  background: yellow;
+}
+
+.flex {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+}
+.grid {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.link,
+.bt {
+  margin: 0.2rem;
+  padding: 0.2rem;
+  display: inline-block;
+  font-weight: bold;
+  color: currentColor;
+}
+.link {
+  color: white;
+  background-color: hsl(var(--clr-darker));
+  text-decoration: none;
+  text-shadow: 2px 2px black;
+}
+.bt {
+  cursor: pointer;
+  border: none;
+  color: black;
+  background-color: white;
+  box-shadow: 0.2rem 0.2rem 0.2rem black;
+  &:active {
+    box-shadow: inset 0.2rem 0.2rem 0.2rem black;
+  }
+}
+
+.form {
+  display: grid;
+  margin: 1rem auto;
+  padding: 0.4rem;
+  gap: 0.4rem;
+
+  & > * {
+    padding: 1rem;
+    font-weight: bold;
+  }
+  & input,
+  textarea {
+    box-shadow: -0.2rem -0.2rem 0.2rem black;
+  }
+}
+
+.loader {
+  margin: auto;
+  width: 4rem;
+  height: auto;
+  aspect-ratio: 1/1;
+
+  &.spin {
+    border-radius: 50%;
+    background-image: conic-gradient(black, white);
+    animation: rotate-full 1s infinite linear;
+  }
+}
+
+.share {
+  padding: 0.4rem 2rem;
+  font-size: 2rem;
+  background: linear-gradient(
+    hsl(var(--clr-lighter)),
+    hsl(var(--clr-lighter), 0.6),
+    hsl(var(--clr-lighter), 0.4),
+    hsl(var(--clr-lighter), 0.6),
+    hsl(var(--clr-lighter))
+  );
+  border-radius: 2rem/2rem;
+}
+
+/* CMPS */
+#notifications {
+  position: fixed;
+  z-index: 1000;
+  inset: 2rem auto auto 2rem;
+
+  p {
+    padding: 1rem;
+    font-size: 2rem;
+    font-weight: bold;
+    color: black;
+    background-color: hsl(240, 60%, 80%);
+    &.success {
+      background-color: hsl(120, 60%, 80%);
+    }
+    &.error {
+      background-color: hsl(0, 60%, 80%);
+    }
+  }
+}
+
+#nav-page {
+  ul.flex {
+    flex-wrap: wrap;
+    @media (width> 40rem) {
+      flex-wrap: nowrap;
+    }
+  }
+}
+
+#copyright {
+  font-size: 0.8rem;
+  .link {
+    font-size: 0.8rem;
+  }
+}
+
+#to-top {
+  position: fixed;
+  z-index: 900;
+  inset: auto 2rem 1rem auto;
+  cursor: pointer;
+  width: 3rem;
+  aspect-ratio: 1/1;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  background: conic-gradient(
+    hsl(var(--clr-darker)),
+    hsl(var(--clr-lighter)),
+    hsl(var(--clr-darker))
+  );
+  @media (hover) {
+    opacity: 0.2;
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+#theme {
+  position: absolute;
+  z-index: 800;
+  inset: auto 6rem 1rem auto;
+
+  button {
+    width: 2rem;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    background-color: currentColor;
+    cursor: pointer;
+  }
+}

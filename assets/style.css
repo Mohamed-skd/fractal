@@ -1,0 +1,101 @@
+@import url("./styles/reset.css");
+@import url("./styles/variables.css");
+@import url("./styles/animations.css");
+@import url("./styles/lib.css");
+
+/* BASE */
+:root {
+  @media (prefers-reduced-motion: no-preference) {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  position: relative;
+  min-height: 100dvh;
+  background-color: hsl(var(--clr-lighter), 0.4);
+}
+body > * {
+  display: flow-root;
+}
+body > header {
+  & > div.flex {
+    flex-wrap: wrap;
+
+    .share {
+      margin: auto;
+    }
+  }
+  h1 {
+    padding: 1rem;
+    width: fit-content;
+    @media (width > 40rem) {
+      padding: 1rem 4rem;
+    }
+  }
+}
+body > main {
+  margin: 1rem auto;
+  & > section {
+    margin: 1rem auto;
+    width: min(80rem, 100% - 1rem);
+  }
+}
+body > footer {
+  margin-top: 1rem;
+  padding: 0.2rem 2rem;
+}
+
+/* CMPS */
+#app {
+  @media (width>60rem) {
+    grid-template-columns: 4fr 3fr;
+  }
+  & > * {
+    width: 100%;
+    max-height: 500px;
+  }
+}
+
+canvas {
+  background-color: black;
+}
+
+form.form {
+  margin: 0 auto;
+  padding: 1rem;
+  width: 100%;
+  align-items: center;
+  background-color: hsl(var(--clr-darker), 0.2);
+
+  @media (width>40rem) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  label {
+    padding: 1.4rem 1rem;
+    flex-wrap: wrap;
+    background: radial-gradient(
+      circle at 100% 0%,
+      hsl(var(--clr-white), 0.6),
+      transparent 30%
+    );
+  }
+
+  input:not(input[type="checkbox"]) {
+    padding: 0.6rem;
+    flex-basis: 100%;
+    text-align: center;
+  }
+  input[type="checkbox"] {
+    width: 2rem;
+    aspect-ratio: 1/1;
+    box-shadow: none;
+  }
+
+  button {
+    padding: 0.4rem;
+    font-size: 1.6rem;
+    grid-column: span 2;
+  }
+}

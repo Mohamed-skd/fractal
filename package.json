@@ -1,0 +1,11 @@
+{
+  "name": "fractale",
+  "version": "1.0.0",
+  "scripts": {
+    "meta": "node meta.js"
+  },
+  "author": "Moh. SD",
+  "private": true,
+  "type": "module",
+  "license": "ISC"
+}
