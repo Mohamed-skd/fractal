@@ -4,7 +4,7 @@ export function info(info, name) {
   console.log(info);
 }
 export function todo(info) {
-  console.warn(`\n❗ À faire: ${info}\n`);
+  console.warn(`\n❗ To do: ${info}\n`);
   return false;
 }
 export function error(err) {

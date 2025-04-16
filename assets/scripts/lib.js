@@ -97,7 +97,7 @@ export class SectionsSetter {
 
   constructor() {
     try {
-      if (SectionsSetter.isSet) throw new Error("SectionsSetter already set.");
+      if (SectionsSetter.isSet) throw new Error("Already set.");
       SectionsSetter.isSet = true;
 
       const navPage = domFn.select("#nav-page");
@@ -145,13 +145,15 @@ export class Copyright {
    * Copyright DOM elem
    * @param {string} content Copyright info
    * @param {{ref:string, content:string}} link Copyright link
+   * @param {number} startDate Start of dating frame
    */
   constructor(
     content = "Par ",
-    link = { ref: "https://moh-sd.free.nf/", content: "Moh. SD" }
+    link = { ref: "https://moh-sd.free.nf/", content: "Moh. SD" },
+    startDate
   ) {
     try {
-      if (Copyright.isSet) throw new Error("Copyright already set.");
+      if (Copyright.isSet) throw new Error("Already set.");
       Copyright.isSet = true;
 
       const copyright = domFn.select("#copyright");
@@ -164,16 +166,25 @@ export class Copyright {
 
       copyright.textContent = "";
       if (!this.content && !this.link) {
-        copyright.textContent = `© ${date.getFullYear()}`;
+        copyright.textContent = `© ${
+          startDate ? startDate + " -" : ""
+        } ${date.getFullYear()}`;
       } else if (!this.link) {
-        copyright.append(this.content, ` © ${date.getFullYear()}`);
+        copyright.append(
+          this.content,
+          ` © ${startDate ? startDate + " -" : ""} ${date.getFullYear()}`
+        );
       } else {
         const anchor = domFn.create("a", {
           href: this.link.ref,
           class: "link",
         });
         anchor.textContent = this.link.content;
-        copyright.append(this.content, anchor, ` © ${date.getFullYear()}`);
+        copyright.append(
+          this.content,
+          anchor,
+          ` © ${startDate ? startDate + " -" : ""} ${date.getFullYear()}`
+        );
       }
     } catch (err) {
       error(err);
@@ -185,7 +196,7 @@ export class TopButton {
 
   constructor() {
     try {
-      if (TopButton.isSet) throw new Error("Top Button already set.");
+      if (TopButton.isSet) throw new Error("Already set.");
       TopButton.isSet = true;
 
       const topBt = domFn.select("#to-top");
@@ -380,17 +391,27 @@ export class Canvas {
 }
 export class Share {
   static isSet = false;
+  link;
+  notification;
 
-  constructor() {
+  /**
+   * Share buttons (copy link to clipboard)
+   * @param {string} btText Buttons text content
+   * @param {string} notification Notification to display when buttons are clicked
+   * @param {string} link The link to share
+   */
+  constructor(btText, notification, link) {
     try {
       if (Share.isSet) throw new Error("Already Set.");
       Share.isSet = true;
 
+      this.link = link;
+      this.notification = notification;
       const bts = domFn.selectAll(".share");
       bts.forEach((bt) => {
         domFn.modClass(bt, "bt");
-        bt.textContent = "Partager";
-        bt.addEventListener("click", this.listener);
+        bt.textContent = btText;
+        bt.addEventListener("click", this.listener.bind(this));
       });
     } catch (err) {
       error(err);
@@ -399,10 +420,11 @@ export class Share {
 
   async listener() {
     try {
-      await navigator.clipboard.writeText(location.href);
+      this.link = this.link ? this.link : location.href;
+      await navigator.clipboard.writeText(this.link);
     } catch (err) {
       return error(err);
     }
-    new Notification("Lien copié !", "success");
+    if (this.notification) new Notification(this.notification, "success");
   }
 }

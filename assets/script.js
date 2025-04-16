@@ -10,7 +10,7 @@ const fetchFn = new FetchFuncs();
 // APP
 new Copyright();
 new ThemeSetter();
-new Share();
+new Share("Partager", "Lien copié !");
 
 // fractale
 const url = new URL(location.href, location.origin);
@@ -124,10 +124,6 @@ function listener(e) {
   }
 }
 
-try {
-  init();
-  loop();
-  form.addEventListener("submit", listener);
-} catch (err) {
-  error(err);
-}
+init();
+loop();
+form.addEventListener("submit", listener);
