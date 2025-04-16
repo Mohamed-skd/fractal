@@ -420,8 +420,9 @@ export class Share {
 
   async listener() {
     try {
-      this.link = this.link ? this.link : location.href;
-      await navigator.clipboard.writeText(this.link);
+      await navigator.clipboard.writeText(
+        this.link ? this.link : location.href
+      );
     } catch (err) {
       return error(err);
     }
