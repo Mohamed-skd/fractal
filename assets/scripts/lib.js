@@ -1,5 +1,5 @@
 import { NumberFuncs, DomFuncs, FetchFuncs } from "./client.js";
-import { error } from "./base.js";
+import { errorLog } from "./base.js";
 
 const numFn = new NumberFuncs();
 const domFn = new DomFuncs();
@@ -30,7 +30,7 @@ export class Notification {
         p.remove();
       }, 1000 * this.delay);
     } catch (err) {
-      error(err);
+      errorLog(err);
     }
   }
 }
@@ -64,7 +64,7 @@ export class ThemeSetter {
         this.setTheme();
       });
     } catch (err) {
-      error(err);
+      errorLog(err);
     }
   }
 
@@ -134,7 +134,7 @@ export class SectionsSetter {
         }
       }
     } catch (err) {
-      error(err);
+      errorLog(err);
     }
   }
 }
@@ -187,7 +187,7 @@ export class Copyright {
         );
       }
     } catch (err) {
-      error(err);
+      errorLog(err);
     }
   }
 }
@@ -204,7 +204,7 @@ export class TopButton {
 
       topBt.addEventListener("click", () => scroll(0, 0));
     } catch (err) {
-      error(err);
+      errorLog(err);
     }
   }
 }
@@ -215,14 +215,14 @@ export class Canvas {
    */
   constructor(canvas) {
     try {
-      if (!(canvas instanceof HTMLCanvasElement))
+      if (!domFn.isElem(canvas, HTMLCanvasElement))
         throw new Error(`Invalid canvas element: ${canvas}.`);
 
       this.canvas = canvas;
       this.ctxt = canvas.getContext("2d");
       this.ctxt.translate(this.canvas.width / 2, this.canvas.height / 2);
     } catch (err) {
-      error(err);
+      errorLog(err);
     }
   }
 
@@ -310,7 +310,7 @@ export class Canvas {
    * @returns
    */
   triangle(point = [0, 0], size = 50, style = [0, 0, 0]) {
-    const height = Math.tan(numFn.degToRad(60) * Math.PI) * (size / 2);
+    const height = Math.tan(numFn.degToRad(60)) * (size / 2);
     const summits = [];
     let angle = 0;
 
@@ -363,13 +363,7 @@ export class Canvas {
   circle(point = [0, 0], size = 50, style = [0, 0, 0]) {
     this.ctxt.strokeStyle = this.getColor(...style);
     this.ctxt.beginPath();
-    this.ctxt.arc(
-      point[0],
-      point[1],
-      size / 2,
-      0,
-      numFn.degToRad(360) * Math.PI
-    );
+    this.ctxt.arc(point[0], point[1], size / 2, 0, numFn.degToRad(360));
     this.ctxt.stroke();
     this.ctxt.closePath();
   }
@@ -414,17 +408,15 @@ export class Share {
         bt.addEventListener("click", this.listener.bind(this));
       });
     } catch (err) {
-      error(err);
+      errorLog(err);
     }
   }
 
   async listener() {
     try {
-      await navigator.clipboard.writeText(
-        this.link ? this.link : location.href
-      );
+      await navigator.clipboard.writeText(this.link ?? location.href);
     } catch (err) {
-      return error(err);
+      return errorLog(err);
     }
     if (this.notification) new Notification(this.notification, "success");
   }

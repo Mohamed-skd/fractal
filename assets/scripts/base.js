@@ -1,15 +1,18 @@
 // LOGGERS
-export function info(info, name) {
-  console.info(name ? `\nℹ️ ${name}:` : `\nℹ️`);
-  console.log(info);
+export function logInfo(message) {
+  console.log(`ℹ️  ${message} ℹ️`);
 }
-export function todo(info) {
-  console.warn(`\n❗ To do: ${info}\n`);
-  return false;
+export function logSuccess(message) {
+  console.log(`✅ ${message} ✅`);
 }
-export function error(err) {
-  console.warn("\n❌ Oups ! An error occured 😔.\n");
-  console.error(err);
-  console.error("\n");
+export function logError(message) {
+  console.log(`❌ ${message} ❌`);
+}
+export function detailLog(detail) {
+  console.log({ detail });
+}
+export function errorLog(error) {
+  logError("Oups ! An error occured 😔");
+  console.error(error);
   return false;
 }

@@ -1,4 +1,4 @@
-import { error } from "./scripts/base.js";
+import { errorLog } from "./scripts/base.js";
 import { NumberFuncs, DomFuncs, FetchFuncs } from "./scripts/client.js";
 import { Copyright, Canvas, Share, ThemeSetter } from "./scripts/lib.js";
 
@@ -92,7 +92,7 @@ function loop(time) {
 
     return requestAnimationFrame(loop);
   } catch (err) {
-    return error(err);
+    return errorLog(err);
   }
 }
 /**
@@ -118,9 +118,9 @@ function listener(e) {
       speed,
       direction,
     };
-    history.replaceState(null, null, `?${fetchFn.objToReq(payload)}`);
+    history.replaceState(null, null, fetchFn.objToReq(payload));
   } catch (err) {
-    return error(err);
+    return errorLog(err);
   }
 }
 

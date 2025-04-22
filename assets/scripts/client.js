@@ -23,7 +23,7 @@ export class NumberFuncs {
   median(nums) {
     const sorted = nums.toSorted((a, b) => a - b);
 
-    if (sorted.length & 1) {
+    if (!(sorted.length & 1)) {
       const mid = sorted.length / 2;
       return this.avg([sorted[mid - 1], sorted[mid]]);
     } else {
@@ -41,7 +41,7 @@ export class NumberFuncs {
   }
 
   destPosition(src, angle, length) {
-    const radAngle = this.degToRad(angle) * Math.PI;
+    const radAngle = this.degToRad(angle);
     const toX = src[0] + Math.cos(radAngle) * length;
     const toY = src[1] + Math.sin(radAngle) * length;
     return [toX, toY];
@@ -52,11 +52,11 @@ export class NumberFuncs {
   }
 
   radToDeg(rad) {
-    return rad * 180;
+    return rad * (180 / Math.PI);
   }
 
   degToRad(deg) {
-    return deg * (1 / 180);
+    return deg * (Math.PI / 180);
   }
 
   loop(n, start = 0, end = 100) {
@@ -78,21 +78,6 @@ export class NumberFuncs {
   }
 }
 export class StringFuncs {
-  constructor() {
-    this.numFn = new NumberFuncs();
-  }
-
-  shuffle(str) {
-    let out = "";
-
-    for (let i = 0; i < str.length; i++) {
-      const random = this.numFn.rand(str.length);
-      out += str[random];
-    }
-
-    return out;
-  }
-
   strRev(str) {
     return str.split("").reverse().join("");
   }
@@ -109,10 +94,6 @@ export class StringFuncs {
   }
 }
 export class DomFuncs {
-  constructor() {
-    this.fetchFn = new FetchFuncs();
-  }
-
   isElem(elem, type = HTMLElement) {
     return elem instanceof type;
   }
@@ -142,6 +123,8 @@ export class DomFuncs {
       del: () => elem.classList.remove(className),
       tog: () => elem.classList.toggle(className),
     };
+    if (!Object.keys(mods).includes(mod))
+      throw new Error(`Invalid modifier: ${mod}`);
 
     mods[mod]();
   }
@@ -156,14 +139,6 @@ export class DomFuncs {
     while (parent.firstElementChild) {
       parent.firstElementChild.remove();
     }
-  }
-
-  htmlText(tag, value = "", attributes = {}, open = true) {
-    let attribs = "";
-    for (let key in attributes) {
-      attribs += ` ${key}="${attributes[key]}"`;
-    }
-    return open ? `<${tag}${attribs}>${value}</${tag}>` : `<${tag}${attribs}/>`;
   }
 
   prependHtml(parent, html) {
@@ -189,11 +164,11 @@ export class DateFuncs {
     return new Date(unix * 1000);
   }
 
-  dayToSeconds(day = 7) {
+  daysToSeconds(day = 7) {
     return day * 86400;
   }
 
-  secondsToDay(seconds) {
+  secondsToDays(seconds) {
     return Math.round(seconds / 86400);
   }
 
@@ -214,14 +189,16 @@ export class DateFuncs {
 
     return `${hours}:${minutes}:${seconds}`;
   }
+
+  datetime() {
+    return `${this.today()} ${this.time()}`;
+  }
 }
 export class FetchFuncs {
-  async get(target = location.pathname, value = null, rType = "json") {
-    const request = this.objToReq(value);
-    const req = await fetch(request ? `${target}?${request}` : target);
+  async #returnData(req, returnType) {
     let data;
 
-    switch (rType) {
+    switch (returnType) {
       case "json":
         data = await req.json();
         break;
@@ -233,7 +210,13 @@ export class FetchFuncs {
     return data;
   }
 
-  async post(target = location.pathname, value = null, rType = "json") {
+  async get(value = null, returnType = "json", target = location.href) {
+    const request = this.objToReq(value);
+    const req = await fetch(request ? `${target}?${request}` : target);
+    return await this.#returnData(req, returnType);
+  }
+
+  async post(value = null, returnType = "json", target = location.href) {
     const request = this.objToReq(value);
     const req = await fetch(target, {
       method: "post",
@@ -242,18 +225,7 @@ export class FetchFuncs {
         "content-type": "application/x-www-form-urlencoded",
       },
     });
-    let data;
-
-    switch (rType) {
-      case "json":
-        data = await req.json();
-        break;
-      case "text":
-        data = await req.text();
-        break;
-    }
-
-    return data;
+    return await this.#returnData(req, returnType);
   }
 
   objToReq(value = null) {
@@ -262,15 +234,15 @@ export class FetchFuncs {
 
     for (const key in value) {
       const val = `${value[key]}`.trim();
-      req += `${key}=${val}&`;
+      req += `?${encodeURIComponent(key)}=${encodeURIComponent(val)}&`;
     }
     return req;
   }
 
   reqToObj(req) {
     const obj = {};
-    const tab = req.split("?");
-    const values = tab[1].split("&");
+    const tab = req.includes("?") ? req.split("?") : req;
+    const values = typeof tab === "string" ? tab.split("&") : tab[1].split("&");
 
     for (let i = 0; i < values.length; i++) {
       const tab = values[i].split("=");
