@@ -220,7 +220,7 @@ export class FetchFuncs {
     const request = this.objToReq(value);
     const req = await fetch(target, {
       method: "post",
-      body: request,
+      body: request.substring(1),
       headers: {
         "content-type": "application/x-www-form-urlencoded",
       },
