@@ -229,12 +229,12 @@ export class FetchFuncs {
   }
 
   objToReq(value = null) {
-    let req = "";
+    let req = "?";
     if (!value) return req;
 
     for (const key in value) {
       const val = `${value[key]}`.trim();
-      req += `?${encodeURIComponent(key)}=${encodeURIComponent(val)}&`;
+      req += `${encodeURIComponent(key)}=${encodeURIComponent(val)}&`;
     }
     return req;
   }
