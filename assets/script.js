@@ -118,7 +118,7 @@ function listener(e) {
       speed,
       direction,
     };
-    history.replaceState(null, null, fetchFn.objToReq(payload));
+    history.replaceState(null, null, fetchFn.objToHttpReq(payload));
   } catch (err) {
     return errorLog(err);
   }

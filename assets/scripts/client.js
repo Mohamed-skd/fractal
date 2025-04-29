@@ -211,13 +211,13 @@ export class FetchFuncs {
   }
 
   async get(value = null, returnType = "json", target = location.href) {
-    const request = this.objToReq(value);
+    const request = this.objToHttpReq(value);
     const req = await fetch(request ? `${target}?${request}` : target);
     return await this.#returnData(req, returnType);
   }
 
   async post(value = null, returnType = "json", target = location.href) {
-    const request = this.objToReq(value);
+    const request = this.objToHttpReq(value);
     const req = await fetch(target, {
       method: "post",
       body: request.substring(1),
@@ -228,7 +228,7 @@ export class FetchFuncs {
     return await this.#returnData(req, returnType);
   }
 
-  objToReq(value = null) {
+  objToHttpReq(value = null) {
     let req = "?";
     if (!value) return req;
 
@@ -239,7 +239,7 @@ export class FetchFuncs {
     return req;
   }
 
-  reqToObj(req) {
+  httpReqToObj(req) {
     const obj = {};
     const tab = req.includes("?") ? req.split("?") : req;
     const values = typeof tab === "string" ? tab.split("&") : tab[1].split("&");
@@ -248,7 +248,7 @@ export class FetchFuncs {
       const tab = values[i].split("=");
       obj[tab[0]] = tab[1].trim();
     }
-    return [tab[0], obj];
+    return obj;
   }
 
   local(key) {
