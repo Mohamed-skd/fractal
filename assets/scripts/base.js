@@ -1,4 +1,3 @@
-// LOGGERS
 export function logInfo(message) {
   console.log(`ℹ️ ${message} ℹ️`);
 }

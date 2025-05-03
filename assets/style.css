@@ -19,13 +19,6 @@ body > * {
   display: flow-root;
 }
 body > header {
-  & > div.flex {
-    flex-wrap: wrap;
-
-    .share {
-      margin: auto;
-    }
-  }
   h1 {
     padding: 1rem;
     width: fit-content;
@@ -42,7 +35,7 @@ body > main {
   }
 }
 body > footer {
-  margin-top: 1rem;
+  margin-top: 2rem;
   padding: 0.2rem 2rem;
 }
 

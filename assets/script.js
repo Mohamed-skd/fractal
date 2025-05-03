@@ -1,23 +1,18 @@
+import { NumberFn, FetchFn } from "./scripts/lib.js";
+import { DomFn } from "./scripts/client.js";
 import { errorLog } from "./scripts/base.js";
-import { NumberFuncs, DomFuncs, FetchFuncs } from "./scripts/client.js";
-import { Copyright, Canvas, Share, ThemeSetter } from "./scripts/lib.js";
 
 // UTILS
-const numFn = new NumberFuncs();
-const domFn = new DomFuncs();
-const fetchFn = new FetchFuncs();
+const numFn = new NumberFn();
+const fetchFn = new FetchFn();
+const domFn = new DomFn();
 
 // APP
-new Copyright();
-new ThemeSetter();
-new Share("Partager", "Lien copié !");
-
-// fractale
 const url = new URL(location.href, location.origin);
 const params = url.searchParams;
-const domCvs = domFn.select("canvas");
+const canvas = domFn.select("canvas");
+const context = canvas.getContext("2d");
 const form = domFn.select("form");
-const canvas = new Canvas(domCvs);
 const center = [0, 0];
 let depth = parseInt(params.get("layers") ?? 5);
 let branches = parseInt(params.get("branches") ?? 5);
@@ -41,6 +36,7 @@ function init() {
   formBaseAngle.value = baseAngle;
   formSpeed.value = speed;
   formDirection.checked = direction;
+  context.translate(canvas.width / 2, canvas.height / 2);
 }
 /**
  * Draw a fractal of flakes
@@ -59,8 +55,18 @@ function fractale(center, branches, size, width, depth) {
   let angle = baseAngle;
 
   for (let i = 0; i < branches; i++) {
-    canvas.ctxt.lineWidth = width;
-    nexts.push(canvas.line(center, angle, size, [baseAngle, 100, 50]));
+    const dest = numFn.destPosition(center, angle, size);
+
+    context.lineWidth = width;
+    context.strokeStyle = `hsl(${baseAngle}, 100%, 50%)`;
+
+    context.beginPath();
+    context.moveTo(center[0], center[1]);
+    context.lineTo(dest[0], dest[1]);
+    context.stroke();
+    context.closePath();
+
+    nexts.push(dest);
     angle += angleSect;
   }
 
@@ -84,7 +90,13 @@ function loop(time) {
     if (time < startTime + 20) return requestAnimationFrame(loop);
     startTime = time;
 
-    canvas.clear();
+    const clearSize = Math.max(canvas.width, canvas.height);
+    context.clearRect(
+      center[0] - clearSize / 2 - 10,
+      center[1] - clearSize / 2 - 10,
+      clearSize + 20,
+      clearSize + 20
+    );
     size = numFn.clamp(size, 0, Infinity);
     fractale(center, branches, size, 2, depth);
     speed = numFn.clamp(speed, 0, Infinity);

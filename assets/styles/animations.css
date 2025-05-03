@@ -1,4 +1,3 @@
-/* TRANSLATIONS */
 @keyframes to-right {
   100% {
     translate: 100%;
@@ -20,7 +19,6 @@
   }
 }
 
-/* ROTATIONS */
 @keyframes rotate-full {
   100% {
     rotate: 360deg;
@@ -42,7 +40,6 @@
   }
 }
 
-/* SCALING */
 @keyframes double {
   100% {
     scale: 2;

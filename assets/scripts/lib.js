@@ -1,423 +1,195 @@
-import { NumberFuncs, DomFuncs, FetchFuncs } from "./client.js";
-import { errorLog } from "./base.js";
-
-const numFn = new NumberFuncs();
-const domFn = new DomFuncs();
-const fetchFn = new FetchFuncs();
-
-export class Notification {
-  /**
-   * Notification DOM elem
-   * @param {string} content Notification
-   * @param {string} type Notification type
-   * @param {number} delay Delay (in seconds) before removing the notification
-   */
-  constructor(content, type, delay = 2) {
-    try {
-      const notifications = domFn.select("#notifications");
-      if (!domFn.isElem(notifications))
-        throw new Error(`Invalid DOM root: ${notifications}.`);
-
-      const p = domFn.create("p");
-      this.content = content;
-      this.type = type;
-      this.delay = delay;
-
-      if (this.type) domFn.modClass(p, this.type);
-      p.textContent = this.content;
-      notifications.append(p);
-      setTimeout(() => {
-        p.remove();
-      }, 1000 * this.delay);
-    } catch (err) {
-      errorLog(err);
+export class NumberFn {
+  range(max = 100, min = 0, step = 1, type = 0) {
+    const arr = [];
+    while (min <= max) {
+      arr.push(min);
+      min += step;
     }
-  }
-}
-export class ThemeSetter {
-  static isSet = false;
 
-  /**
-   * Set Dark Theme button
-   * @param {HTMLElement[]} elems
-   */
-  constructor(elems = null) {
-    try {
-      if (ThemeSetter.isSet) throw new Error("Already Set.");
-      ThemeSetter.isSet = true;
-
-      const themeDom = domFn.select("#theme");
-      if (!domFn.isElem(themeDom))
-        throw new Error(`Invalid DOM root: ${themeDom}.`);
-
-      const mediaScheme = matchMedia("(prefers-color-scheme:dark)");
-      const button = domFn.create("button", { title: "THEME" });
-      this.elems = elems;
-      this.histTheme = fetchFn.local("dark-theme");
-      this.darkTheme = this.histTheme.get() ?? mediaScheme.matches;
-
-      this.setTheme();
-      themeDom.append(button);
-      button.addEventListener("click", this.togTheme.bind(this));
-      mediaScheme.addEventListener("change", () => {
-        this.darkTheme = mediaScheme.matches;
-        this.setTheme();
-      });
-    } catch (err) {
-      errorLog(err);
-    }
+    const str = arr.join(" ");
+    const types = [arr, str];
+    return types[type];
   }
 
-  setTheme() {
-    if (this.darkTheme) {
-      document.documentElement.style.colorScheme = "dark";
-      if (this.elems?.length) {
-        for (let i = 0; i < this.elems.length; i++) {
-          domFn.modClass(this.elems[i], "dark");
-        }
-      }
+  rand(max = 101, min = 0) {
+    return Math.floor(Math.random() * (max - min)) + min;
+  }
+
+  avg(nums) {
+    const sum = nums.reduce((a, b) => a + b);
+    return sum / nums.length;
+  }
+
+  median(nums) {
+    const sorted = nums.toSorted((a, b) => a - b);
+
+    if (!(sorted.length & 1)) {
+      const mid = sorted.length / 2;
+      return this.avg([sorted[mid - 1], sorted[mid]]);
     } else {
-      document.documentElement.style.colorScheme = "light";
-      if (this.elems?.length) {
-        for (let i = 0; i < this.elems.length; i++) {
-          domFn.modClass(this.elems[i], "dark", "del");
-        }
-      }
-    }
-    this.histTheme.set(this.darkTheme);
-  }
-
-  togTheme() {
-    this.darkTheme = !this.darkTheme;
-    this.setTheme();
-  }
-}
-export class SectionsSetter {
-  static isSet = false;
-
-  constructor() {
-    try {
-      if (SectionsSetter.isSet) throw new Error("Already set.");
-      SectionsSetter.isSet = true;
-
-      const navPage = domFn.select("#nav-page");
-      let liste;
-      if (navPage) {
-        liste = domFn.create("ul", { class: "flex" });
-        navPage.append(liste);
-      }
-
-      const sections = domFn.selectAll("main > section");
-      if (!sections.length) throw new Error(`No sections: ${sections}.`);
-
-      for (const sect of sections) {
-        if (!domFn.isElem(sect)) continue;
-
-        const id = sect.id.trim();
-        if (!id) continue;
-
-        const name = id[0].toUpperCase() + id.replace("-", " ").slice(1);
-        const title = domFn.create("h2");
-        title.textContent = name;
-        sect.prepend(title);
-
-        if (domFn.isElem(liste)) {
-          const listElem = domFn.create("li");
-          const link = domFn.create("a", {
-            class: "link",
-            href: `#${id}`,
-            target: "_self",
-          });
-          link.textContent = name;
-          listElem.append(link);
-          liste.append(listElem);
-        }
-      }
-    } catch (err) {
-      errorLog(err);
-    }
-  }
-}
-export class Copyright {
-  static isSet = false;
-
-  /**
-   * Copyright DOM elem
-   * @param {string} content Copyright info
-   * @param {{ref:string, content:string}} link Copyright link
-   * @param {number} startDate Start of dating frame
-   */
-  constructor(
-    content = "Par ",
-    link = { ref: "https://moh-sd.free.nf/", content: "Moh. SD" },
-    startDate
-  ) {
-    try {
-      if (Copyright.isSet) throw new Error("Already set.");
-      Copyright.isSet = true;
-
-      const copyright = domFn.select("#copyright");
-      if (!domFn.isElem(copyright))
-        throw new Error(`Invalid DOM root: ${copyright}.`);
-
-      const date = new Date();
-      this.content = content;
-      this.link = link;
-
-      copyright.textContent = "";
-      if (!this.content && !this.link) {
-        copyright.textContent = `© ${
-          startDate ? startDate + " -" : ""
-        } ${date.getFullYear()}`;
-      } else if (!this.link) {
-        copyright.append(
-          this.content,
-          ` © ${startDate ? startDate + " -" : ""} ${date.getFullYear()}`
-        );
-      } else {
-        const anchor = domFn.create("a", {
-          href: this.link.ref,
-          class: "link",
-        });
-        anchor.textContent = this.link.content;
-        copyright.append(
-          this.content,
-          anchor,
-          ` © ${startDate ? startDate + " -" : ""} ${date.getFullYear()}`
-        );
-      }
-    } catch (err) {
-      errorLog(err);
-    }
-  }
-}
-export class TopButton {
-  static isSet = false;
-
-  constructor() {
-    try {
-      if (TopButton.isSet) throw new Error("Already set.");
-      TopButton.isSet = true;
-
-      const topBt = domFn.select("#to-top");
-      if (!domFn.isElem(topBt)) throw new Error(`Invalid DOM root: ${topBt}.`);
-
-      topBt.addEventListener("click", () => scroll(0, 0));
-    } catch (err) {
-      errorLog(err);
-    }
-  }
-}
-export class Canvas {
-  /**
-   * Boosted Canvas elem
-   * @param {HTMLCanvasElement} canvas
-   */
-  constructor(canvas) {
-    try {
-      if (!domFn.isElem(canvas, HTMLCanvasElement))
-        throw new Error(`Invalid canvas element: ${canvas}.`);
-
-      this.canvas = canvas;
-      this.ctxt = canvas.getContext("2d");
-      this.ctxt.translate(this.canvas.width / 2, this.canvas.height / 2);
-    } catch (err) {
-      errorLog(err);
+      const floor = Math.floor(sorted.length / 2);
+      return sorted[floor];
     }
   }
 
-  /**
-   * Clear canvas
-   * @param {[number, number]} point Origin point
-   * @param {number} size Size of clearing zone
-   */
-  clear(
-    point = [0, 0],
-    size = Math.max(this.canvas.width, this.canvas.height)
-  ) {
-    this.ctxt.clearRect(
-      point[0] - size / 2 - 10,
-      point[1] - size / 2 - 10,
-      size + 20,
-      size + 20
-    );
+  clamp(num, min, max) {
+    return Math.min(Math.max(num, min), max);
   }
 
-  /**
-   * Return ccs style color
-   * @param {number} h Hue
-   * @param {number} s Saturation
-   * @param {number} l Lightness
-   * @param {number} a Alpha
-   * @returns
-   */
-  getColor(h, s, l, a = 1) {
-    a = numFn.clamp(a, 0, 1);
-    return `hsl(${h}, ${s}%, ${l}%, ${a})`;
+  dist(point1, point2) {
+    return Math.hypot(point1[0] - point2[0], point1[1] - point2[1]);
   }
 
-  /**
-   * Return canvas linear gradient
-   * @param {[number, number]} src Origin point
-   * @param {number} angle Angle in degree
-   * @param {number} size Gradient size
-   * @param {{offset:number, color:[number, number, number]}[]} styles Gradient colors layers
-   * @returns
-   */
-  getLinearGradient(src, angle, size, styles) {
-    const dest = numFn.destPosition(src, angle, size);
-    const gradient = this.ctxt.createLinearGradient(
-      src[0],
-      src[1],
-      dest[0],
-      dest[1]
-    );
-
-    for (let i = 0; i < styles.length; i++) {
-      gradient.addColorStop(
-        styles[i].offset,
-        this.getColor(...styles[i].color)
-      );
-    }
-    return gradient;
-  }
-
-  /**
-   * Draw a line
-   * @param {[number, number]} point Origin point
-   * @param {number} angle Angle in degree
-   * @param {number} length Line size
-   * @param {[number, number, number]} style Hsl color
-   * @returns
-   */
-  line(point = [0, 0], angle = 0, length = 50, style = [0, 0, 0]) {
-    const [toX, toY] = numFn.destPosition(point, angle, length);
-    this.ctxt.strokeStyle = this.getColor(...style);
-    this.ctxt.beginPath();
-    this.ctxt.moveTo(point[0], point[1]);
-    this.ctxt.lineTo(toX, toY);
-    this.ctxt.stroke();
-    this.ctxt.closePath();
-
+  destPosition(src, angle, length) {
+    const radAngle = this.degToRad(angle);
+    const toX = src[0] + Math.cos(radAngle) * length;
+    const toY = src[1] + Math.sin(radAngle) * length;
     return [toX, toY];
   }
 
-  /**
-   * Draw a triangle
-   * @param {[number, number]} point Origin point
-   * @param {number} size Triangle base size
-   * @param {[number, number, number]} style Hsl color
-   * @returns
-   */
-  triangle(point = [0, 0], size = 50, style = [0, 0, 0]) {
-    const height = Math.tan(numFn.degToRad(60)) * (size / 2);
-    const summits = [];
-    let angle = 0;
-
-    point = [point[0] - size / 2, point[1] + height / 2];
-    this.ctxt.strokeStyle = this.getColor(...style);
-    this.ctxt.beginPath();
-    this.ctxt.moveTo(point[0], point[1]);
-    for (let i = 0; i < 3; i++) {
-      const [x, y] = numFn.destPosition(point, angle, size);
-      this.ctxt.lineTo(x, y);
-      point[0] = x;
-      point[1] = y;
-      angle += -120;
-      summits.push([x, y]);
-    }
-    this.ctxt.stroke();
-    this.ctxt.closePath();
-
-    return summits;
+  diff(num1, num2) {
+    return Math.abs(num1 - num2);
   }
 
-  /**
-   * Draw a square
-   * @param {[number, number]} point Origin point
-   * @param {number} size Square base size
-   * @param {[number, number, number]} style Hsl color
-   * @returns
-   */
-  square(point = [0, 0], size = 50, style = [0, 0, 0]) {
-    this.ctxt.strokeStyle = this.getColor(...style);
-    this.ctxt.beginPath();
-    this.ctxt.rect(point[0] - size / 2, point[1] - size / 2, size, size);
-    this.ctxt.stroke();
-    this.ctxt.closePath();
-
-    return [
-      [point[0] - size / 2, point[1] - size / 2],
-      [point[0] + size / 2, point[1] - size / 2],
-      [point[0] + size / 2, point[1] + size / 2],
-      [point[0] - size / 2, point[1] + size / 2],
-    ];
+  radToDeg(rad) {
+    return rad * (180 / Math.PI);
   }
 
-  /**
-   * Draw a circle
-   * @param {[number, number]} point Origin point
-   * @param {number} size Radius size
-   * @param {[number, number, number]} style Hsl color
-   */
-  circle(point = [0, 0], size = 50, style = [0, 0, 0]) {
-    this.ctxt.strokeStyle = this.getColor(...style);
-    this.ctxt.beginPath();
-    this.ctxt.arc(point[0], point[1], size / 2, 0, numFn.degToRad(360));
-    this.ctxt.stroke();
-    this.ctxt.closePath();
+  degToRad(deg) {
+    return deg * (Math.PI / 180);
   }
 
-  /**
-   * Draw a path
-   * @param {[number, number][]} points Path points
-   * @param {[number, number, number]} style Hsl color
-   */
-  path(points, style = [0, 0, 0]) {
-    this.ctxt.strokeStyle = this.getColor(...style);
-    this.ctxt.beginPath();
-    for (let i = 0; i < points.length; i++) {
-      this.ctxt.lineTo(points[i][0], points[i][1]);
-    }
-    this.ctxt.stroke();
-    this.ctxt.closePath();
+  loop(n, start = 0, end = 100) {
+    n = n < start ? end : n;
+    n = n > end ? start : n;
+    return n;
+  }
+
+  formatTwoDigit(val) {
+    return val < 10 ? `0${val}` : val;
+  }
+
+  areEqualPoints(point1, ...points) {
+    return points.every((p) => p[0] === point1[0] && p[1] === point1[1]);
+  }
+
+  isBetween(num, min, max, strict = true) {
+    return strict ? num > min && num < max : num >= min && num <= max;
   }
 }
-export class Share {
-  static isSet = false;
-  link;
-  notification;
-
-  /**
-   * Share buttons (copy link to clipboard)
-   * @param {string} btText Buttons text content
-   * @param {string} notification Notification to display when buttons are clicked
-   * @param {string} link The link to share
-   */
-  constructor(btText, notification, link) {
-    try {
-      if (Share.isSet) throw new Error("Already Set.");
-      Share.isSet = true;
-
-      this.link = link;
-      this.notification = notification;
-      const bts = domFn.selectAll(".share");
-      bts.forEach((bt) => {
-        domFn.modClass(bt, "bt");
-        bt.textContent = btText;
-        bt.addEventListener("click", this.listener.bind(this));
-      });
-    } catch (err) {
-      errorLog(err);
-    }
+export class StringFn {
+  strRev(str) {
+    return str.split("").reverse().join("");
   }
 
-  async listener() {
-    try {
-      await navigator.clipboard.writeText(this.link ?? location.href);
-    } catch (err) {
-      return errorLog(err);
+  sanitize(str, limit = 100) {
+    if (!str) return null;
+    if (typeof str !== "string") return null;
+
+    const sanitized = str.trim();
+    if (!sanitized) return null;
+
+    if (sanitized.length > limit) return null;
+    return sanitized;
+  }
+}
+export class DateFn {
+  constructor() {
+    this.numFn = new NumberFn();
+  }
+
+  dateToUnix(date) {
+    return Math.round(Date.parse(date) / 1000);
+  }
+
+  unixToDate(unix) {
+    return new Date(unix * 1000);
+  }
+
+  daysToSeconds(day = 7) {
+    return day * 86400;
+  }
+
+  secondsToDays(seconds) {
+    return Math.round(seconds / 86400);
+  }
+
+  today() {
+    const date = new Date();
+    const day = this.numFn.formatTwoDigit(date.getDate());
+    const month = this.numFn.formatTwoDigit(date.getMonth() + 1);
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
+  }
+
+  time() {
+    const date = new Date();
+    const hours = this.numFn.formatTwoDigit(date.getHours());
+    const minutes = this.numFn.formatTwoDigit(date.getMinutes());
+    const seconds = this.numFn.formatTwoDigit(date.getSeconds());
+
+    return `${hours}:${minutes}:${seconds}`;
+  }
+
+  datetime() {
+    return `${this.today()} ${this.time()}`;
+  }
+}
+export class FetchFn {
+  async #returnData(req, returnType) {
+    let data;
+
+    switch (returnType) {
+      case "json":
+        data = await req.json();
+        break;
+      case "text":
+        data = await req.text();
+        break;
     }
-    if (this.notification) new Notification(this.notification, "success");
+
+    return data;
+  }
+
+  async get(value = null, returnType = "json", target = location.href) {
+    const request = this.objToHttpReq(value);
+    const req = await fetch(request ? `${target}?${request}` : target);
+    return await this.#returnData(req, returnType);
+  }
+
+  async post(value = null, returnType = "json", target = location.href) {
+    const request = this.objToHttpReq(value);
+    const req = await fetch(target, {
+      method: "post",
+      body: request.substring(1),
+      headers: {
+        "content-type": "application/x-www-form-urlencoded",
+      },
+    });
+    return await this.#returnData(req, returnType);
+  }
+
+  objToHttpReq(value = null) {
+    let req = "?";
+    if (!value) return req;
+
+    for (const key in value) {
+      const val = `${value[key]}`.trim();
+      req += `${encodeURIComponent(key)}=${encodeURIComponent(val)}&`;
+    }
+    return req;
+  }
+
+  httpReqToObj(req) {
+    const obj = {};
+    const tab = req.includes("?") ? req.split("?") : req;
+    const values = typeof tab === "string" ? tab.split("&") : tab[1].split("&");
+
+    for (let i = 0; i < values.length; i++) {
+      const tab = values[i].split("=");
+      obj[tab[0]] = tab[1].trim();
+    }
+    return obj;
   }
 }

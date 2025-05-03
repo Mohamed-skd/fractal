@@ -1,5 +1,4 @@
 :root {
-  /* SIZES */
   --sz-sm-1: 0.4rem;
   --sz-sm-2: 0.6rem;
   --sz-sm-3: 0.8rem;
@@ -8,7 +7,6 @@
   --sz-bg-2: 40rem;
   --sz-bg-3: 80rem;
 
-  /* COLORS */
   --clr: 60;
   --clr-black: var(--clr), 10%, 10%;
   --clr-grey: var(--clr), 10%, 50%;
