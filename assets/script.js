@@ -45,7 +45,6 @@ function init() {
  * @param {number} size Branche size
  * @param {number} width Line width
  * @param {number} depth Number of repetition
- * @returns
  */
 function fractale(center, branches, size, width, depth) {
   if (depth === 0) return;
@@ -79,7 +78,6 @@ function fractale(center, branches, size, width, depth) {
 /**
  * Animation loop
  * @param {DOMHighResTimeStamp} time Time stamp
- * @returns
  */
 function loop(time) {
   try {
