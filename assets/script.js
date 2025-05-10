@@ -14,12 +14,13 @@ const canvas = domFn.select("canvas");
 const context = canvas.getContext("2d");
 const form = domFn.select("form");
 const center = [0, 0];
+const lineWidth = 10;
 let depth = parseInt(params.get("layers") ?? 5);
-let branches = parseInt(params.get("branches") ?? 5);
-let size = parseInt(params.get("size") ?? 100);
-let baseAngle = parseInt(params.get("base-angle") ?? 0);
+let branches = parseInt(params.get("branches") ?? 3);
+let size = parseInt(params.get("size") ?? 200);
+let baseAngle = parseInt(params.get("base-angle") ?? -90);
 let startTime;
-let speed = parseInt(params.get("speed") ?? 0);
+let speed = parseInt(params.get("speed") ?? 1);
 let direction = params.get("direction") === "true" ? true : false;
 
 function init() {
@@ -53,21 +54,20 @@ function fractale(center, branches, size, width, depth) {
   const nexts = [];
   let angle = baseAngle;
 
+  context.beginPath();
   for (let i = 0; i < branches; i++) {
     const dest = numFn.destPosition(center, angle, size);
 
     context.lineWidth = width;
     context.strokeStyle = `hsl(${baseAngle}, 100%, 50%)`;
-
-    context.beginPath();
     context.moveTo(center[0], center[1]);
     context.lineTo(dest[0], dest[1]);
-    context.stroke();
-    context.closePath();
 
     nexts.push(dest);
     angle += angleSect;
   }
+  context.stroke();
+  context.closePath();
 
   angle = baseAngle;
   size /= 2;
@@ -85,7 +85,7 @@ function loop(time) {
       startTime = time;
       return requestAnimationFrame(loop);
     }
-    if (time < startTime + 20) return requestAnimationFrame(loop);
+    if (time < startTime + 40) return requestAnimationFrame(loop);
     startTime = time;
 
     const clearSize = Math.max(canvas.width, canvas.height);
@@ -95,10 +95,13 @@ function loop(time) {
       clearSize + 20,
       clearSize + 20
     );
-    size = numFn.clamp(size, 0, Infinity);
-    fractale(center, branches, size, 2, depth);
-    speed = numFn.clamp(speed, 0, Infinity);
-    baseAngle += direction ? speed * 0.5 : speed * 0.5 * -1;
+
+    branches = numFn.clamp(branches, 1, 20);
+    size = numFn.clamp(size, 50, 1000);
+    depth = numFn.clamp(depth, 1, 10);
+    fractale(center, branches, size, lineWidth, depth);
+    speed = numFn.clamp(speed, 0, 30);
+    baseAngle += speed * 0.3 * (direction ? 1 : -1);
 
     return requestAnimationFrame(loop);
   } catch (err) {
