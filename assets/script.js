@@ -15,6 +15,7 @@ const context = canvas.getContext("2d");
 const form = domFn.select("form");
 const center = [0, 0];
 const lineWidth = 10;
+const clearSize = Math.max(canvas.width, canvas.height) + 20;
 let depth = parseInt(params.get("layers") ?? 5);
 let branches = parseInt(params.get("branches") ?? 3);
 let size = parseInt(params.get("size") ?? 200);
@@ -88,12 +89,11 @@ function loop(time) {
     if (time < startTime + 40) return requestAnimationFrame(loop);
     startTime = time;
 
-    const clearSize = Math.max(canvas.width, canvas.height);
     context.clearRect(
-      center[0] - clearSize / 2 - 10,
-      center[1] - clearSize / 2 - 10,
-      clearSize + 20,
-      clearSize + 20
+      -clearSize / 2 - 10,
+      -clearSize / 2 - 10,
+      clearSize,
+      clearSize
     );
 
     branches = numFn.clamp(branches, 1, 20);
