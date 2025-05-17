@@ -11,11 +11,12 @@ export class NumberFn {
     return types[type];
   }
 
-  rand(max = 101, min = 0) {
-    return Math.floor(Math.random() * (max - min)) + min;
+  rand(max = 100, min = 0) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
   avg(nums) {
+    if (!nums.length) return 0;
     const sum = nums.reduce((a, b) => a + b);
     return sum / nums.length;
   }
@@ -154,7 +155,7 @@ export class FetchFn {
 
   async get(value = null, returnType = "json", target = location.href) {
     const request = this.objToHttpReq(value);
-    const req = await fetch(request ? `${target}?${request}` : target);
+    const req = await fetch(`${target}${request}`);
     return await this.#returnData(req, returnType);
   }
 
