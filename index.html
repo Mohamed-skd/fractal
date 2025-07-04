@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,12 +10,12 @@
     <!-- <link rel="stylesheet" href="./assets/style.css" /> -->
     <script type="module" src="./dist/script.js"></script>
     <!-- <script type="module" src="./assets/script.js"></script> -->
-    <title>Fractale</title>
+    <title>Fractal</title>
   </head>
 
   <body>
     <header>
-      <h1>Fractale</h1>
+      <h1>Fractal</h1>
     </header>
 
     <main>
@@ -24,27 +24,27 @@
 
         <form target="_self" class="form">
           <label class="flex">
-            Angle de départ
-            <input type="number" name="base-angle" />
+            Start Angle
+	    <input type="number" name="base-angle" />
           </label>
           <label class="flex">
             Branches
             <input type="number" name="branches" min="1" max="20" />
           </label>
           <label class="flex">
-            Couches
+            Layers
             <input type="number" name="layers" min="1" max="10" />
           </label>
           <label class="flex">
-            Taille
+            Size
             <input type="number" name="size" min="50" max="1000" />
           </label>
           <label class="flex">
-            Vitesse
+            Speed
             <input type="number" name="speed" min="0" max="30" />
           </label>
           <label class="flex">
-            Sens horaire
+            Clockwise
             <input type="checkbox" name="direction" />
           </label>
 
@@ -54,3 +54,4 @@
     </main>
   </body>
 </html>
+
